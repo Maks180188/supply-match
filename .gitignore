@@ -1,0 +1,63 @@
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+.nova/
+.zed/
+.cursor/
+.codex/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Composer auth
+auth.json
+
+# Backend / Laravel
+backend/.env
+backend/.env.*
+!backend/.env.example
+backend/vendor/
+backend/node_modules/
+backend/.phpunit.cache/
+backend/.phpunit.result.cache
+backend/public/build/
+backend/public/hot
+backend/public/storage
+backend/storage/*.key
+backend/storage/pail/
+backend/storage/framework/cache/data/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/storage/logs/*
+backend/bootstrap/cache/*.php
+backend/database/*.sqlite
+backend/database/*.sqlite-*
+backend/_ide_helper.php
+
+# Frontend / Vue
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+
+# Coverage
+coverage/
+backend/coverage/
+
+# Tool caches
+frontend/.eslintcache
