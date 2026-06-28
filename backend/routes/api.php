@@ -2,9 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+Route::get('/health', function () {
     return response()->json([
-        'name' => 'SupplyMatch API',
         'status' => 'ok',
+        'service' => 'supply-match-api',
     ]);
 });
