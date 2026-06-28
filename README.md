@@ -19,6 +19,7 @@ The main goal of this project is to demonstrate clean fullstack engineering prac
 * API documentation
 * Docker-based local environment
 * GitHub Actions CI
+* Production-ready deployment foundation
 
 ## Tech Stack
 
@@ -26,18 +27,21 @@ The main goal of this project is to demonstrate clean fullstack engineering prac
 
 Current setup:
 
-* PHP 8.3+
+* PHP 8.3
 * Laravel 13
+* PostgreSQL 17
+* Nginx
+* PHP-FPM
 * PHPUnit
+* Docker Compose
 
 Planned backend stack:
 
-* PostgreSQL
 * Laravel Sanctum
 * OpenAPI documentation
 * Static analysis
 * Code style checks
-* Docker
+* GitHub Actions CI
 
 ### Frontend
 
@@ -62,29 +66,115 @@ supply-match/
   docker/    Docker configuration
 ```
 
-## Local Development
+## Docker Development
 
-### Backend
-
-```bash
-cd backend
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan serve
-```
-
-Backend application:
+The backend runs in Docker using the following services:
 
 ```text
-http://127.0.0.1:8000
+Browser
+  -> Nginx container
+  -> PHP-FPM container
+  -> Laravel API
+  -> PostgreSQL container
 ```
 
-### Frontend
+The frontend currently runs separately through the Vite development server.
+
+### Environment Files
+
+Copy environment files:
+
+```bash
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+Root `.env` is used by Docker Compose.
+
+Backend `.env` is used by Laravel.
+
+Frontend `.env` is used by Vite.
+
+### Start Docker Services
+
+```bash
+docker compose up -d --build
+```
+
+### Install Backend Dependencies
+
+```bash
+docker compose exec php composer install
+```
+
+### Generate Application Key
+
+```bash
+docker compose exec php php artisan key:generate
+```
+
+### Run Database Migrations
+
+```bash
+docker compose exec php php artisan migrate
+```
+
+### Backend API
+
+```text
+http://127.0.0.1:8080
+```
+
+### Health Check
+
+```text
+http://127.0.0.1:8080/api/health
+```
+
+Expected response:
+
+```json
+{
+  "status": "ok",
+  "service": "supply-match-api"
+}
+```
+
+### PostgreSQL
+
+PostgreSQL is available from the host machine at:
+
+```text
+127.0.0.1:5433
+```
+
+Default local credentials:
+
+```text
+Database: supply_match
+User:     supply_match_user
+Password: supply_match_password
+```
+
+Inside Docker, Laravel connects to PostgreSQL using the service name:
+
+```text
+postgres:5432
+```
+
+## Frontend Development
+
+Install frontend dependencies:
 
 ```bash
 cd frontend
 npm install
+```
+
+Start Vite development server:
+
+```bash
 npm run dev
 ```
 
@@ -94,13 +184,20 @@ Frontend application:
 http://127.0.0.1:5173
 ```
 
+The frontend API base URL is configured in `frontend/.env`:
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8080/api
+```
+
 ## Quality Checks
 
 ### Backend
 
+Run backend tests inside the PHP container:
+
 ```bash
-cd backend
-php artisan test
+docker compose exec php php artisan test
 ```
 
 ### Frontend
@@ -183,6 +280,7 @@ The project is in the initial setup stage.
 Implemented so far:
 
 * Laravel backend skeleton
+* Laravel API-only mode
 * Vue 3 frontend skeleton
 * TypeScript support
 * Vue Router
@@ -190,12 +288,16 @@ Implemented so far:
 * Unit testing setup
 * Linting and formatting setup
 * Root monorepo structure
+* Docker Compose environment
+* Nginx container
+* PHP-FPM container
+* PostgreSQL container
+* Backend health check endpoint
+* Backend database connection
+* Initial Laravel migrations
 
 ## Roadmap
 
-* Configure PostgreSQL
-* Configure Docker Compose
-* Convert Laravel backend to API-first structure
 * Add Laravel Sanctum
 * Implement authentication
 * Add company model
@@ -205,3 +307,4 @@ Implemented so far:
 * Add search
 * Add OpenAPI documentation
 * Add GitHub Actions CI
+* Add production deployment configuration
