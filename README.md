@@ -27,7 +27,7 @@ The main goal of this project is to demonstrate clean fullstack engineering prac
 
 Current setup:
 
-* PHP 8.3
+* PHP 8.4
 * Laravel 13
 * PostgreSQL 17
 * Nginx
