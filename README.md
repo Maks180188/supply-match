@@ -1,5 +1,8 @@
 # SupplyMatch
 
+[![Backend CI](https://github.com/Maks180188/supply-match/actions/workflows/backend.yml/badge.svg)](https://github.com/Maks180188/supply-match/actions/workflows/backend.yml)
+[![Frontend CI](https://github.com/Maks180188/supply-match/actions/workflows/frontend.yml/badge.svg)](https://github.com/Maks180188/supply-match/actions/workflows/frontend.yml)
+
 SupplyMatch is a B2B sourcing platform where companies publish procurement requests and suppliers submit proposals.
 
 The project is being built as a fullstack portfolio application with a Laravel API backend and a Vue SPA frontend.
@@ -41,7 +44,6 @@ Planned backend stack:
 * OpenAPI documentation
 * Static analysis
 * Code style checks
-* GitHub Actions CI
 
 ### Frontend
 
@@ -295,6 +297,8 @@ Implemented so far:
 * Backend health check endpoint
 * Backend database connection
 * Initial Laravel migrations
+* Backend GitHub Actions CI
+* Frontend GitHub Actions CI
 
 ## Roadmap
 
@@ -306,5 +310,4 @@ Implemented so far:
 * Add supplier proposal model and status transitions
 * Add search
 * Add OpenAPI documentation
-* Add GitHub Actions CI
 * Add production deployment configuration
