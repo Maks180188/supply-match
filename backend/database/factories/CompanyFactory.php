@@ -24,14 +24,14 @@ class CompanyFactory extends Factory
 
     public function buyer(): static
     {
-        return $this->state(fn(): array => [
+        return $this->state(fn (): array => [
             'type' => CompanyType::Buyer,
         ]);
     }
 
     public function supplier(): static
     {
-        return $this->state(fn(): array => [
+        return $this->state(fn (): array => [
             'type' => CompanyType::Supplier,
         ]);
     }

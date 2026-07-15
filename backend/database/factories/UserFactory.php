@@ -34,14 +34,14 @@ class UserFactory extends Factory
 
     public function unverified(): static
     {
-        return $this->state(fn(): array => [
+        return $this->state(fn (): array => [
             'email_verified_at' => null,
         ]);
     }
 
     public function buyer(): static
     {
-        return $this->state(fn(): array => [
+        return $this->state(fn (): array => [
             'company_id' => Company::factory()->buyer(),
             'role' => UserRole::Buyer,
         ]);
@@ -49,7 +49,7 @@ class UserFactory extends Factory
 
     public function supplier(): static
     {
-        return $this->state(fn(): array => [
+        return $this->state(fn (): array => [
             'company_id' => Company::factory()->supplier(),
             'role' => UserRole::Supplier,
         ]);
@@ -57,7 +57,7 @@ class UserFactory extends Factory
 
     public function admin(): static
     {
-        return $this->state(fn(): array => [
+        return $this->state(fn (): array => [
             'company_id' => null,
             'role' => UserRole::Admin,
         ]);
