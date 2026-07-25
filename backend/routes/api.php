@@ -18,4 +18,5 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/sourcing-requests', [SourcingRequestController::class, 'store']);
+    Route::post('/sourcing-requests/{sourcingRequest}/submit', [SourcingRequestController::class, 'submit']);
 });

@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Enums\UserRole;
+use App\Models\SourcingRequest;
 use App\Models\User;
 
 class SourcingRequestPolicy
@@ -13,5 +14,10 @@ class SourcingRequestPolicy
     public function create(User $user): bool
     {
         return $user->role === UserRole::Buyer;
+    }
+
+    public function submit(User $user, SourcingRequest $sourcingRequest): bool
+    {
+        return $user->role === UserRole::Buyer && $user->company_id === $sourcingRequest->company_id;
     }
 }
