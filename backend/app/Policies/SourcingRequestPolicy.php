@@ -20,4 +20,9 @@ class SourcingRequestPolicy
     {
         return $user->role === UserRole::Buyer && $user->company_id === $sourcingRequest->company_id;
     }
+
+    public function publish(User $user): bool
+    {
+        return $user->role === UserRole::Admin;
+    }
 }
