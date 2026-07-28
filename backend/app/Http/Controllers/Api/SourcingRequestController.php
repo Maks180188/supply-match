@@ -28,6 +28,17 @@ class SourcingRequestController extends Controller
         return SourcingRequestResource::collection($sourcingRequests);
     }
 
+    public function show(int $sourcingRequest): SourcingRequestResource
+    {
+        $sourcingRequest = SourcingRequest::query()
+            ->whereKey($sourcingRequest)
+            ->where('status', SourcingRequestStatus::Published)
+            ->with('keywords')
+            ->firstOrFail();
+
+        return new SourcingRequestResource($sourcingRequest);
+    }
+
     /**
      * @throws Throwable
      */

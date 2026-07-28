@@ -16,6 +16,7 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
 Route::get('/sourcing-requests', [SourcingRequestController::class, 'index']);
+Route::get('/sourcing-requests/{sourcingRequest}', [SourcingRequestController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/auth/me', [AuthController::class, 'me']);
