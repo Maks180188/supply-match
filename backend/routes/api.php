@@ -20,6 +20,6 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/sourcing-requests', [SourcingRequestController::class, 'store']);
     Route::post('/sourcing-requests/{sourcingRequest}/submit', [SourcingRequestController::class, 'submit']);
-    Route::post('/admin/sourcing-requests/{sourcingRequest}/publish', [AdminSourcingRequestController::class, 'publish']
-    );
+    Route::post('/admin/sourcing-requests/{sourcingRequest}/publish', [AdminSourcingRequestController::class, 'publish']);
+    Route::post('/admin/sourcing-requests/{sourcingRequest}/reject', [AdminSourcingRequestController::class, 'reject']);
 });

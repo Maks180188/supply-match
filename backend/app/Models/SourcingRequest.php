@@ -21,6 +21,7 @@ class SourcingRequest extends Model
         'status',
         'submission_deadline',
         'published_at',
+        'rejection_reason',
     ];
 
     protected function casts(): array

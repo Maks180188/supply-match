@@ -25,4 +25,9 @@ class SourcingRequestPolicy
     {
         return $user->role === UserRole::Admin;
     }
+
+    public function reject(User $user): bool
+    {
+        return $user->role === UserRole::Admin;
+    }
 }

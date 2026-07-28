@@ -22,6 +22,7 @@ class SourcingRequestResource extends JsonResource
             'keywords' => $this->whenLoaded('keywords', fn () => $this->keywords->pluck('keyword')->values()),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
+            'rejection_reason' => $this->rejection_reason,
         ];
     }
 }
