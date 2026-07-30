@@ -25,4 +25,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/sourcing-requests/{sourcingRequest}/submit', [SourcingRequestController::class, 'submit']);
     Route::post('/admin/sourcing-requests/{sourcingRequest}/publish', [AdminSourcingRequestController::class, 'publish']);
     Route::post('/admin/sourcing-requests/{sourcingRequest}/reject', [AdminSourcingRequestController::class, 'reject']);
+    Route::get('/my/sourcing-requests', [SourcingRequestController::class, 'mine']);
+    Route::get('/my/sourcing-requests/{sourcingRequest}', [SourcingRequestController::class, 'showMine']);
+    Route::put('/my/sourcing-requests/{sourcingRequest}', [SourcingRequestController::class, 'update']);
 });

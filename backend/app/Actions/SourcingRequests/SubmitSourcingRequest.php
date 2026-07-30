@@ -22,11 +22,19 @@ class SubmitSourcingRequest
                 ->lockForUpdate()
                 ->findOrFail($sourcingRequest->getKey());
 
-            if ($sourcingRequest->status !== SourcingRequestStatus::Draft) {
-                throw new DomainException('Only draft sourcing requests can be submitted.');
+            if (! in_array($sourcingRequest->status, [
+                SourcingRequestStatus::Draft,
+                SourcingRequestStatus::Rejected,
+            ], true)) {
+                throw new DomainException(
+                    'Only draft or rejected sourcing requests can be submitted.'
+                );
             }
 
+            $fromStatus = $sourcingRequest->status;
+
             $sourcingRequest->status = SourcingRequestStatus::PendingModeration;
+            $sourcingRequest->rejection_reason = null;
             $sourcingRequest->save();
 
             AuditLog::create([
@@ -35,7 +43,7 @@ class SubmitSourcingRequest
                 'auditable_type' => $sourcingRequest->getMorphClass(),
                 'auditable_id' => $sourcingRequest->getKey(),
                 'metadata' => [
-                    'from_status' => SourcingRequestStatus::Draft->value,
+                    'from_status' => $fromStatus->value,
                     'to_status' => SourcingRequestStatus::PendingModeration->value,
                 ],
             ]);
