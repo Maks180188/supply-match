@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Admin\SourcingRequestController as AdminSourcingRequestController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Category\CategoryController;
 use App\Http\Controllers\Api\SourcingRequestController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,7 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 
 Route::get('/sourcing-requests', [SourcingRequestController::class, 'index']);
 Route::get('/sourcing-requests/{sourcingRequest}', [SourcingRequestController::class, 'show']);
+Route::get('/categories', [CategoryController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/auth/me', [AuthController::class, 'me']);
