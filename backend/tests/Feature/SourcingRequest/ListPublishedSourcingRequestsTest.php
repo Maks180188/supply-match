@@ -10,6 +10,7 @@ use App\Models\Company;
 use App\Models\SourcingRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class ListPublishedSourcingRequestsTest extends TestCase
@@ -106,5 +107,72 @@ class ListPublishedSourcingRequestsTest extends TestCase
             ->assertJsonPath('meta.last_page', 2)
             ->assertJsonPath('meta.per_page', 15)
             ->assertJsonPath('meta.total', 16);
+    }
+
+    public function test_published_sourcing_requests_can_be_filtered_by_category(): void
+    {
+        $company = Company::factory()->buyer()->create();
+        $buyer = User::factory()->for($company)->create([
+            'role' => UserRole::Buyer,
+        ]);
+
+        $itCategory = Category::factory()->create();
+        $officeCategory = Category::factory()->create();
+
+        $matchingRequest = SourcingRequest::create([
+            'company_id' => $company->id,
+            'category_id' => $itCategory->id,
+            'created_by' => $buyer->id,
+            'title' => 'Office laptops',
+            'description' => 'We need laptops for our employees.',
+            'status' => SourcingRequestStatus::Published,
+            'published_at' => now(),
+        ]);
+
+        $otherCategoryRequest = SourcingRequest::create([
+            'company_id' => $company->id,
+            'category_id' => $officeCategory->id,
+            'created_by' => $buyer->id,
+            'title' => 'Office chairs',
+            'description' => 'We need chairs for our employees.',
+            'status' => SourcingRequestStatus::Published,
+            'published_at' => now(),
+        ]);
+
+        $draftRequest = SourcingRequest::create([
+            'company_id' => $company->id,
+            'category_id' => $itCategory->id,
+            'created_by' => $buyer->id,
+            'title' => 'Office monitors',
+            'description' => 'We need monitors for our employees.',
+            'status' => SourcingRequestStatus::Draft,
+        ]);
+
+        $response = $this->getJson("/api/sourcing-requests?category_id={$itCategory->id}");
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $matchingRequest->id)
+            ->assertJsonMissing(['id' => $otherCategoryRequest->id])
+            ->assertJsonMissing(['id' => $draftRequest->id]);
+    }
+
+    #[DataProvider('invalidCategoryIds')]
+    public function test_category_filter_must_be_valid(mixed $categoryId): void
+    {
+        $response = $this->getJson("/api/sourcing-requests?category_id={$categoryId}");
+
+        $response
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('category_id');
+    }
+
+    public static function invalidCategoryIds(): array
+    {
+        return [
+            'not an integer' => ['invalid'],
+            'category does not exist' => [999999],
+        ];
     }
 }

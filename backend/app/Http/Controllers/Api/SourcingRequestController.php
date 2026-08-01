@@ -7,6 +7,7 @@ use App\Actions\SourcingRequests\SubmitSourcingRequest;
 use App\Actions\SourcingRequests\UpdateSourcingRequest;
 use App\Enums\SourcingRequestStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ListSourcingRequestsRequest;
 use App\Http\Requests\StoreSourcingRequestRequest;
 use App\Http\Resources\SourcingRequestResource;
 use App\Models\SourcingRequest;
@@ -18,10 +19,14 @@ use Throwable;
 
 class SourcingRequestController extends Controller
 {
-    public function index()
+    public function index(ListSourcingRequestsRequest $request)
     {
         $sourcingRequests = SourcingRequest::query()
             ->where('status', SourcingRequestStatus::Published)
+            ->when(
+                $request->validated('category_id'),
+                fn ($query, $categoryId) => $query->where('category_id', $categoryId)
+            )
             ->with('keywords')
             ->latest('published_at')
             ->paginate();
