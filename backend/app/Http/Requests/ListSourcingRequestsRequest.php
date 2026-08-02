@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ListSourcingRequestsRequest extends FormRequest
+final class ListSourcingRequestsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,6 +24,7 @@ class ListSourcingRequestsRequest extends FormRequest
     {
         return [
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'q' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

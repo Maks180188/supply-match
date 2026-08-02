@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreSourcingRequestRequest extends FormRequest
+final class StoreSourcingRequestRequest extends FormRequest
 {
     public function authorize(): bool
     {

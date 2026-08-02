@@ -109,7 +109,7 @@ class ListPublishedSourcingRequestsTest extends TestCase
             ->assertJsonPath('meta.total', 16);
     }
 
-    public function test_published_sourcing_requests_can_be_filtered_by_category(): void
+    public function test_published_sourcing_requests_can_be_filtered_by_category_and_search(): void
     {
         $company = Company::factory()->buyer()->create();
         $buyer = User::factory()->for($company)->create([
@@ -124,7 +124,17 @@ class ListPublishedSourcingRequestsTest extends TestCase
             'category_id' => $itCategory->id,
             'created_by' => $buyer->id,
             'title' => 'Office laptops',
-            'description' => 'We need laptops for our employees.',
+            'description' => 'Equipment for our employees.',
+            'status' => SourcingRequestStatus::Published,
+            'published_at' => now(),
+        ]);
+
+        $sameCategoryNonMatchingRequest = SourcingRequest::create([
+            'company_id' => $company->id,
+            'category_id' => $itCategory->id,
+            'created_by' => $buyer->id,
+            'title' => 'Office monitors',
+            'description' => 'Displays for our employees.',
             'status' => SourcingRequestStatus::Published,
             'published_at' => now(),
         ]);
@@ -133,8 +143,8 @@ class ListPublishedSourcingRequestsTest extends TestCase
             'company_id' => $company->id,
             'category_id' => $officeCategory->id,
             'created_by' => $buyer->id,
-            'title' => 'Office chairs',
-            'description' => 'We need chairs for our employees.',
+            'title' => 'Warehouse laptops',
+            'description' => 'Equipment for warehouse employees.',
             'status' => SourcingRequestStatus::Published,
             'published_at' => now(),
         ]);
@@ -143,18 +153,79 @@ class ListPublishedSourcingRequestsTest extends TestCase
             'company_id' => $company->id,
             'category_id' => $itCategory->id,
             'created_by' => $buyer->id,
-            'title' => 'Office monitors',
-            'description' => 'We need monitors for our employees.',
+            'title' => 'Gaming laptops',
+            'description' => 'High-performance devices.',
             'status' => SourcingRequestStatus::Draft,
         ]);
 
-        $response = $this->getJson("/api/sourcing-requests?category_id={$itCategory->id}");
+        $response = $this->getJson(
+            "/api/sourcing-requests?category_id={$itCategory->id}&q=laptop"
+        );
 
         $response
             ->assertOk()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', $matchingRequest->id)
+            ->assertJsonMissing(['id' => $sameCategoryNonMatchingRequest->id])
             ->assertJsonMissing(['id' => $otherCategoryRequest->id])
+            ->assertJsonMissing(['id' => $draftRequest->id]);
+    }
+
+    public function test_published_sourcing_requests_can_be_searched_by_title_or_description(): void
+    {
+        $company = Company::factory()->buyer()->create();
+        $buyer = User::factory()->for($company)->create([
+            'role' => UserRole::Buyer,
+        ]);
+        $category = Category::factory()->create();
+
+        $titleMatch = SourcingRequest::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'created_by' => $buyer->id,
+            'title' => 'Industrial Laptops',
+            'description' => 'Equipment for warehouse employees.',
+            'status' => SourcingRequestStatus::Published,
+            'published_at' => now(),
+        ]);
+
+        $descriptionMatch = SourcingRequest::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'created_by' => $buyer->id,
+            'title' => 'Office equipment',
+            'description' => 'We need durable laptops for field work.',
+            'status' => SourcingRequestStatus::Published,
+            'published_at' => now()->subMinute(),
+        ]);
+
+        $unrelatedRequest = SourcingRequest::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'created_by' => $buyer->id,
+            'title' => 'Office chairs',
+            'description' => 'Ergonomic furniture for employees.',
+            'status' => SourcingRequestStatus::Published,
+            'published_at' => now(),
+        ]);
+
+        $draftRequest = SourcingRequest::create([
+            'company_id' => $company->id,
+            'category_id' => $category->id,
+            'created_by' => $buyer->id,
+            'title' => 'Gaming laptops',
+            'description' => 'High-performance devices.',
+            'status' => SourcingRequestStatus::Draft,
+        ]);
+
+        $response = $this->getJson('/api/sourcing-requests?q=LAPTOP');
+
+        $response
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.0.id', $titleMatch->id)
+            ->assertJsonPath('data.1.id', $descriptionMatch->id)
+            ->assertJsonMissing(['id' => $unrelatedRequest->id])
             ->assertJsonMissing(['id' => $draftRequest->id]);
     }
 

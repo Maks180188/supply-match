@@ -21,12 +21,25 @@ class SourcingRequestController extends Controller
 {
     public function index(ListSourcingRequestsRequest $request)
     {
-        $sourcingRequests = SourcingRequest::query()
+        $query = SourcingRequest::query()
             ->where('status', SourcingRequestStatus::Published)
             ->when(
                 $request->validated('category_id'),
                 fn ($query, $categoryId) => $query->where('category_id', $categoryId)
-            )
+            );
+
+        $search = $request->validated('q');
+        if ($search !== null) {
+            $pattern = '%'.mb_strtolower($search).'%';
+
+            $query->where(function ($query) use ($pattern) {
+                $query
+                    ->whereRaw('LOWER(title) LIKE ?', [$pattern])
+                    ->orWhereRaw('LOWER(description) LIKE ?', [$pattern]);
+            });
+        }
+
+        $sourcingRequests = $query
             ->with('keywords')
             ->latest('published_at')
             ->paginate();
