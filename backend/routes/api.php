@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Admin\SourcingRequestController as AdminSourcingReq
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Category\CategoryController;
 use App\Http\Controllers\Api\SourcingRequestController;
+use App\Http\Controllers\Api\SupplierProposal\SupplierProposalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/health', function () {
@@ -30,4 +31,5 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/my/sourcing-requests', [SourcingRequestController::class, 'mine']);
     Route::get('/my/sourcing-requests/{sourcingRequest}', [SourcingRequestController::class, 'showMine']);
     Route::put('/my/sourcing-requests/{sourcingRequest}', [SourcingRequestController::class, 'update']);
+    Route::post('/sourcing-requests/{sourcingRequest}/proposals', [SupplierProposalController::class, 'store']);
 });

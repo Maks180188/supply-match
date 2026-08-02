@@ -52,4 +52,9 @@ class SourcingRequest extends Model
     {
         return $this->hasMany(RequestKeyword::class);
     }
+
+    public function proposals(): HasMany
+    {
+        return $this->hasMany(SupplierProposal::class);
+    }
 }
