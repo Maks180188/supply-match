@@ -16,6 +16,7 @@ final class CompanyResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'type' => $this->type,
+            'company' => new CompanyResource($this->whenLoaded('company')),
         ];
     }
 }

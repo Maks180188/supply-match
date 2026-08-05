@@ -9,6 +9,7 @@ use App\Http\Resources\SupplierProposalResource;
 use App\Models\SourcingRequest;
 use DomainException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -37,5 +38,17 @@ class SupplierProposalController extends Controller
         return new SupplierProposalResource($supplierProposal)
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
+    }
+
+    public function index(SourcingRequest $sourcingRequest): AnonymousResourceCollection
+    {
+        Gate::authorize('viewProposals', $sourcingRequest);
+
+        $proposals = $sourcingRequest->proposals()
+            ->with('company')
+            ->latest()
+            ->paginate();
+
+        return SupplierProposalResource::collection($proposals);
     }
 }

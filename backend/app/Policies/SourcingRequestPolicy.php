@@ -50,4 +50,9 @@ class SourcingRequestPolicy
     {
         return $user->role === UserRole::Supplier;
     }
+
+    public function viewProposals(User $user, SourcingRequest $sourcingRequest): bool
+    {
+        return $user->role === UserRole::Buyer && $user->company_id === $sourcingRequest->company_id;
+    }
 }
