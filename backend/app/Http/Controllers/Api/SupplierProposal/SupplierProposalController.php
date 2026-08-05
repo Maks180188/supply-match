@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSupplierProposalRequest;
 use App\Http\Resources\SupplierProposalResource;
 use App\Models\SourcingRequest;
+use App\Models\SupplierProposal;
 use DomainException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,6 +48,19 @@ class SupplierProposalController extends Controller
 
         $proposals = $sourcingRequest->proposals()
             ->with('company')
+            ->latest()
+            ->paginate();
+
+        return SupplierProposalResource::collection($proposals);
+    }
+
+    public function indexMine(Request $request): AnonymousResourceCollection
+    {
+        Gate::authorize('viewAny', SupplierProposal::class);
+
+        $proposals = SupplierProposal::query()
+            ->where('company_id', $request->user()->company_id)
+            ->with('sourcingRequest')
             ->latest()
             ->paginate();
 

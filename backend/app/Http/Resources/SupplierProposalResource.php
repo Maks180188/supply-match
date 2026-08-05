@@ -12,6 +12,7 @@ final class SupplierProposalResource extends JsonResource
         return [
             'id' => $this->id,
             'sourcing_request_id' => $this->sourcing_request_id,
+            'sourcing_request' => new SourcingRequestResource($this->whenLoaded('sourcingRequest')),
             'company_id' => $this->company_id,
             'company' => new CompanyResource($this->whenLoaded('company')),
             'created_by' => $this->created_by,

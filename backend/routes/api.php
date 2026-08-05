@@ -33,4 +33,5 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::put('/my/sourcing-requests/{sourcingRequest}', [SourcingRequestController::class, 'update']);
     Route::post('/sourcing-requests/{sourcingRequest}/proposals', [SupplierProposalController::class, 'store']);
     Route::get('/my/sourcing-requests/{sourcingRequest}/proposals', [SupplierProposalController::class, 'index']);
+    Route::get('/my/proposals', [SupplierProposalController::class, 'indexMine']);
 });
