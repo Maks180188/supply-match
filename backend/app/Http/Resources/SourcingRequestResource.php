@@ -13,6 +13,8 @@ final class SourcingRequestResource extends JsonResource
             'id' => $this->id,
             'company_id' => $this->company_id,
             'category_id' => $this->category_id,
+            'company' => new CompanyResource($this->whenLoaded('company')),
+            'category' => new CategoryResource($this->whenLoaded('category')),
             'created_by' => $this->created_by,
             'title' => $this->title,
             'description' => $this->description,

@@ -66,4 +66,33 @@ class SupplierProposalController extends Controller
 
         return SupplierProposalResource::collection($proposals);
     }
+
+    public function showMine(SupplierProposal $supplierProposal): SupplierProposalResource
+    {
+        Gate::authorize('view', $supplierProposal);
+
+        $supplierProposal->load([
+            'sourcingRequest.company',
+            'sourcingRequest.category',
+            'sourcingRequest.keywords',
+        ]);
+
+        return new SupplierProposalResource($supplierProposal);
+    }
+
+    public function show(SourcingRequest $sourcingRequest, SupplierProposal $supplierProposal): SupplierProposalResource
+    {
+        Gate::authorize('viewProposals', $sourcingRequest);
+
+        if ($supplierProposal->sourcing_request_id !== $sourcingRequest->id) {
+            abort(404);
+        }
+
+        $supplierProposal->load([
+            'company',
+            'sourcingRequest',
+        ]);
+
+        return new SupplierProposalResource($supplierProposal);
+    }
 }
