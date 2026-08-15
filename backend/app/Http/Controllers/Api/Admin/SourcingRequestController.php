@@ -59,7 +59,7 @@ class SourcingRequestController extends Controller
 
         $sourcingRequests = SourcingRequest::query()
             ->where('status', SourcingRequestStatus::PendingModeration)
-            ->with(['company', 'category', 'keywords',])
+            ->with(['company', 'category', 'keywords'])
             ->oldest('created_at')
             ->paginate();
 
@@ -70,7 +70,7 @@ class SourcingRequestController extends Controller
     {
         Gate::authorize('viewAdmin', $sourcingRequest);
 
-        $sourcingRequest->load(['company', 'category', 'keywords',]);
+        $sourcingRequest->load(['company', 'category', 'keywords']);
 
         return new SourcingRequestResource($sourcingRequest);
     }

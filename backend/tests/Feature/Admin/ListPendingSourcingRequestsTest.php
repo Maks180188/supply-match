@@ -11,6 +11,7 @@ use Tests\TestCase;
 class ListPendingSourcingRequestsTest extends TestCase
 {
     use RefreshDatabase;
+
     public function test_admin_can_list_pending_sourcing_requests(): void
     {
         $admin = User::factory()->admin()->create();

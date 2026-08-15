@@ -31,13 +31,13 @@ class SourcingRequestPolicy
         return $user->role === UserRole::Admin;
     }
 
-    //buyer list
+    // buyer list
     public function viewOwn(User $user): bool
     {
         return $user->role === UserRole::Buyer;
     }
 
-    //buyer detail
+    // buyer detail
     public function view(User $user, SourcingRequest $sourcingRequest): bool
     {
         return $user->role === UserRole::Buyer && $user->company_id === $sourcingRequest->company_id;
@@ -58,13 +58,13 @@ class SourcingRequestPolicy
         return $user->role === UserRole::Buyer && $user->company_id === $sourcingRequest->company_id;
     }
 
-    //admin list
+    // admin list
     public function viewAny(User $user): bool
     {
         return $user->role === UserRole::Admin;
     }
 
-    //admin detail
+    // admin detail
     public function viewAdmin(User $user): bool
     {
         return $user->role === UserRole::Admin;
