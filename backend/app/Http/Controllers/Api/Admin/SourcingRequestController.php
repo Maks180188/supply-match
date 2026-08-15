@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Actions\SourcingRequests\PublishSourcingRequest;
 use App\Actions\SourcingRequests\RejectSourcingRequest;
+use App\Enums\SourcingRequestStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RejectSourcingRequestRequest;
 use App\Http\Resources\SourcingRequestResource;
@@ -50,5 +51,27 @@ class SourcingRequestController extends Controller
         }
 
         return new SourcingRequestResource($sourcingRequest)->response();
+    }
+
+    public function index()
+    {
+        Gate::authorize('viewAny', SourcingRequest::class);
+
+        $sourcingRequests = SourcingRequest::query()
+            ->where('status', SourcingRequestStatus::PendingModeration)
+            ->with(['company', 'category', 'keywords',])
+            ->oldest('created_at')
+            ->paginate();
+
+        return SourcingRequestResource::collection($sourcingRequests);
+    }
+
+    public function show(SourcingRequest $sourcingRequest): SourcingRequestResource
+    {
+        Gate::authorize('viewAdmin', $sourcingRequest);
+
+        $sourcingRequest->load(['company', 'category', 'keywords',]);
+
+        return new SourcingRequestResource($sourcingRequest);
     }
 }

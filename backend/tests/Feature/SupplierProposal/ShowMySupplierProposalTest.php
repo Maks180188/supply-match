@@ -11,9 +11,6 @@ class ShowMySupplierProposalTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * A basic feature test example.
-     */
     public function test_supplier_can_view_own_company_proposal(): void
     {
         $proposal = SupplierProposal::factory()->create();

@@ -11,9 +11,6 @@ class ShowSourcingRequestProposalTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * A basic feature test example.
-     */
     public function test_buyer_can_view_proposal_for_own_sourcing_request(): void
     {
         $proposal = SupplierProposal::factory()->create();
