@@ -1,14 +1,28 @@
 import './assets/main.css'
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import {createApp} from 'vue'
+import {createPinia} from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import {useAuthStore} from './stores/auth'
 
-const app = createApp(App)
+async function bootstrap(): Promise<void> {
+  const app = createApp(App)
+  const pinia = createPinia()
 
-app.use(createPinia())
-app.use(router)
+  app.use(pinia)
 
-app.mount('#app')
+  const authStore = useAuthStore(pinia)
+
+  try {
+    await authStore.restore()
+  } catch (error) {
+    console.error('Failed to restore auth session', error)
+  }
+
+  app.use(router)
+  app.mount('#app')
+}
+
+void bootstrap()
