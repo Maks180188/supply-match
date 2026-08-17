@@ -3,7 +3,8 @@ import {defineStore} from 'pinia'
 import {setAuthToken} from '@/api/client'
 import type {LoginPayload, User} from '@/types/auth'
 import axios from 'axios'
-import { getCurrentUser, login as loginRequest } from '@/api/auth'
+import {getCurrentUser, login as loginRequest} from '@/api/auth'
+import {logout as logoutRequest} from '@/api/auth'
 
 const AUTH_TOKEN_KEY = 'auth_token'
 
@@ -48,11 +49,24 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function logout(): Promise<void> {
+    try {
+      await logoutRequest()
+    } finally {
+      user.value = null
+      token.value = null
+
+      localStorage.removeItem(AUTH_TOKEN_KEY)
+      setAuthToken(null)
+    }
+  }
+
   return {
     user,
     token,
     isAuthenticated,
     login,
     restore,
+    logout,
   }
 })

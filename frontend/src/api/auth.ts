@@ -12,3 +12,7 @@ export async function getCurrentUser(): Promise<User> {
 
   return response.data.data
 }
+
+export async function logout(): Promise<void> {
+  await api.post('/auth/logout')
+}

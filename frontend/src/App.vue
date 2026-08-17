@@ -1,5 +1,17 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+async function logout(): Promise<void> {
+  try {
+    await authStore.logout()
+  } finally {
+    await router.push('/login')
+  }
+}
 </script>
 
 <template>
@@ -7,6 +19,13 @@ import { RouterView } from 'vue-router'
     <header class="app-header">
       <div class="container">
         <strong>SupplyMatch</strong>
+        <button
+          v-if="authStore.isAuthenticated"
+          type="button"
+          @click="logout"
+        >
+          Logout
+        </button>
       </div>
     </header>
 
