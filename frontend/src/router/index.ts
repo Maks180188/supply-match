@@ -26,6 +26,11 @@ const router = createRouter({
         guestOnly: true,
       },
     },
+    {
+      path: '/sourcing-requests',
+      name: 'sourcing-requests',
+      component: () => import('../views/SourcingRequestListView.vue'),
+    },
   ],
 })
 

@@ -40,7 +40,7 @@ class SourcingRequestController extends Controller
         }
 
         $sourcingRequests = $query
-            ->with('keywords')
+            ->with(['company', 'category', 'keywords'])
             ->latest('published_at')
             ->paginate();
 

@@ -67,6 +67,8 @@ class ListPublishedSourcingRequestsTest extends TestCase
             ->assertOk()
             ->assertJsonCount(2, 'data')
             ->assertJsonPath('data.0.id', $newerRequest->id)
+            ->assertJsonPath('data.0.company.id', $company->id)
+            ->assertJsonPath('data.0.category.id', $category->id)
             ->assertJsonPath('data.1.id', $olderRequest->id)
             ->assertJsonMissing(['id' => $draftRequest->id]);
     }
