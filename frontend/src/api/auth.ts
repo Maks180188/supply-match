@@ -8,6 +8,8 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
 }
 
 export async function getCurrentUser(): Promise<User> {
+  await getCsrfCookie()
+
   const response = await api.get<{ data: User }>('/auth/me')
 
   return response.data.data
@@ -15,4 +17,10 @@ export async function getCurrentUser(): Promise<User> {
 
 export async function logout(): Promise<void> {
   await api.post('/auth/logout')
+}
+
+async function getCsrfCookie(): Promise<void> {
+  await api.get('/sanctum/csrf-cookie', {
+    baseURL: import.meta.env.VITE_BACKEND_URL,
+  })
 }

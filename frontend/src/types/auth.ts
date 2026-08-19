@@ -23,5 +23,4 @@ export interface LoginPayload {
 
 export interface AuthResponse {
   data: User
-  token: string
 }

@@ -6,11 +6,8 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 async function logout(): Promise<void> {
-  try {
-    await authStore.logout()
-  } finally {
-    await router.push('/login')
-  }
+  await authStore.logout()
+  await router.push('/login')
 }
 </script>
 

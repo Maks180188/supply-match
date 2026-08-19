@@ -11,7 +11,7 @@ use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 final class AuthController extends Controller
@@ -21,29 +21,19 @@ final class AuthController extends Controller
      */
     public function register(RegisterRequest $request, RegisterUser $registerUser): JsonResponse
     {
-        $result = $registerUser->execute($request->validated());
-
-        $user = $result['user'];
-        $token = $result['token'];
-
+        $user = $registerUser->execute($request->validated());
+        $request->session()->regenerate();
         $user->load('company');
 
-        return new UserResource($user)
-            ->additional(['token' => $token])
-            ->response()
-            ->setStatusCode(201);
+        return new UserResource($user)->response()->setStatusCode(201);
     }
 
     public function login(LoginRequest $request, LoginUser $loginUser): JsonResponse
     {
-        $result = $loginUser->execute($request->validated());
+        $user = $loginUser->execute($request->validated());
+        $request->session()->regenerate();
 
-        $user = $result['user'];
-        $token = $result['token'];
-
-        return new UserResource($user)
-            ->additional(['token' => $token])
-            ->response();
+        return new UserResource($user)->response();
     }
 
     public function me(Request $request): UserResource
@@ -56,13 +46,10 @@ final class AuthController extends Controller
 
     public function logout(Request $request): Response
     {
-        $token = $request->user()->currentAccessToken();
+        Auth::guard('web')->logout();
 
-        if (! $token instanceof PersonalAccessToken) {
-            abort(401);
-        }
-
-        $token->delete();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->noContent();
     }

@@ -3,12 +3,13 @@
 namespace App\Actions\Auth;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 final class LoginUser
 {
-    public function execute(array $data): array
+    public function execute(array $data): User
     {
         $user = User::query()
             ->where('email', $data['email'])
@@ -20,11 +21,10 @@ final class LoginUser
             ]);
         }
 
+        Auth::login($user);
+
         $user->load('company');
 
-        return [
-            'user' => $user,
-            'token' => $user->createToken('auth_token')->plainTextToken,
-        ];
+        return $user;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Company;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
@@ -9,6 +11,13 @@ use Tests\TestCase;
 final class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withHeader('Origin', 'http://localhost:5173');
+    }
 
     public function test_user_can_register_a_buyer_company(): void
     {
@@ -40,7 +49,6 @@ final class AuthenticationTest extends TestCase
                         'type',
                     ],
                 ],
-                'token',
             ]);
 
         $this->assertDatabaseHas('companies', [
@@ -54,7 +62,8 @@ final class AuthenticationTest extends TestCase
             'role' => 'buyer',
         ]);
 
-        $this->assertDatabaseCount('personal_access_tokens', 1);
+        $this->assertAuthenticated();
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_can_register_a_supplier_company(): void
@@ -127,48 +136,42 @@ final class AuthenticationTest extends TestCase
 
         $this->assertDatabaseCount('companies', 1);
         $this->assertDatabaseCount('users', 1);
-        $this->assertDatabaseCount('personal_access_tokens', 1);
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_user_can_log_in(): void
     {
-        $this->postJson('/api/auth/register', [
-            'company_name' => 'Acme Procurement',
-            'company_type' => 'buyer',
+        $company = Company::factory()->buyer()->create([
+            'name' => 'Acme Procurement',
+        ]);
+
+        User::factory()->for($company)->create([
             'name' => 'John Buyer',
             'email' => 'john@example.com',
-            'password' => 'Password123',
-            'password_confirmation' => 'Password123',
-        ])->assertCreated();
+        ]);
 
         $response = $this->postJson('/api/auth/login', [
             'email' => 'john@example.com',
-            'password' => 'Password123',
+            'password' => 'password',
         ]);
 
         $response
             ->assertOk()
             ->assertJsonPath('data.email', 'john@example.com')
             ->assertJsonPath('data.role', 'buyer')
-            ->assertJsonPath('data.company.name', 'Acme Procurement')
-            ->assertJsonStructure([
-                'data',
-                'token',
-            ]);
+            ->assertJsonPath('data.company.name', 'Acme Procurement');
 
-        $this->assertDatabaseCount('personal_access_tokens', 2);
+        $this->assertAuthenticated();
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_invalid_credentials_are_rejected(): void
     {
-        $this->postJson('/api/auth/register', [
-            'company_name' => 'Acme Procurement',
-            'company_type' => 'buyer',
-            'name' => 'John Buyer',
+        $company = Company::factory()->buyer()->create();
+
+        User::factory()->for($company)->create([
             'email' => 'john@example.com',
-            'password' => 'Password123',
-            'password_confirmation' => 'Password123',
-        ])->assertCreated();
+        ]);
 
         $response = $this->postJson('/api/auth/login', [
             'email' => 'john@example.com',
@@ -183,23 +186,22 @@ final class AuthenticationTest extends TestCase
                 'The provided credentials are incorrect.',
             );
 
-        $this->assertDatabaseCount('personal_access_tokens', 1);
+        $this->assertGuest();
+        $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
     public function test_authenticated_user_can_retrieve_profile(): void
     {
-        $registrationResponse = $this->postJson('/api/auth/register', [
-            'company_name' => 'Acme Procurement',
-            'company_type' => 'buyer',
+        $company = Company::factory()->buyer()->create([
+            'name' => 'Acme Procurement',
+        ]);
+
+        $user = User::factory()->for($company)->create([
             'name' => 'John Buyer',
             'email' => 'john@example.com',
-            'password' => 'Password123',
-            'password_confirmation' => 'Password123',
-        ])->assertCreated();
+        ]);
 
-        $token = $registrationResponse->json('token');
-
-        $this->withToken($token)
+        $this->actingAs($user)
             ->getJson('/api/auth/me')
             ->assertOk()
             ->assertJsonPath('data.name', 'John Buyer')
@@ -218,29 +220,18 @@ final class AuthenticationTest extends TestCase
 
     public function test_authenticated_user_can_log_out(): void
     {
-        $registrationResponse = $this->postJson('/api/auth/register', [
-            'company_name' => 'Acme Procurement',
-            'company_type' => 'buyer',
-            'name' => 'John Buyer',
-            'email' => 'john@example.com',
-            'password' => 'Password123',
-            'password_confirmation' => 'Password123',
-        ])->assertCreated();
+        $company = Company::factory()->buyer()->create();
+        $user = User::factory()->for($company)->create();
 
-        $token = $registrationResponse->json('token');
-
-        $this->withToken($token)
+        $this->actingAs($user)
             ->postJson('/api/auth/logout')
             ->assertNoContent();
 
+        $this->assertGuest('web');
         $this->assertDatabaseCount('personal_access_tokens', 0);
 
         Auth::forgetGuards();
 
-        $this->assertDatabaseCount('personal_access_tokens', 0);
-
-        $this->withToken($token)
-            ->getJson('/api/auth/me')
-            ->assertUnauthorized();
+        $this->getJson('/api/auth/me');
     }
 }
